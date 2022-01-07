@@ -10,7 +10,6 @@
         </p>
     @endcan
 
-    <p>
     <ul class="list-inline">
         <li><a href="{{ route('admin.events.index') }}"
                style="{{ request('show_deleted') == 1 ? '' : 'font-weight: 700' }}">@lang('global.app_all')</a></li>
@@ -18,8 +17,6 @@
         <li><a href="{{ route('admin.events.index') }}?show_deleted=1"
                style="{{ request('show_deleted') == 1 ? 'font-weight: 700' : '' }}">@lang('global.app_trash')</a></li>
     </ul>
-    </p>
-
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -67,9 +64,9 @@
                             <td>{{ $event->venue_address }}</td>
                             <td>{{ $event->total_cost }}</td>
                             <td>{{ $event->total_guest }}</td>
-                            <td>{{ $event->sent }}</td>
-                            <td>{{ $event->accepted }}</td>
-                            <td>{{ $event->rejected }}</td>
+                            <td>{{ $event->total_invited }}</td>
+                            <td>{{ $event->total_accepted }}</td>
+                            <td>{{ $event->total_rejected }}</td>
                             @if( request('show_deleted') == 1 )
                                 <td>
                                     {!! Form::open(array(

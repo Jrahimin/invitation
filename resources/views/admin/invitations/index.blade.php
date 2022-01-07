@@ -11,15 +11,19 @@
         </p>
     @endcan
 
-    <p>
     <ul class="list-inline">
         <li><a href="{{ route('admin.invitations.index') }}"
-               style="{{ request('show_deleted') == 1 ? '' : 'font-weight: 700' }}">@lang('global.app_all')</a></li>
+               style="{{ (request('show_deleted') == 1 || request('show_invited') == 1 || request('show_uninvited') == 1) ? '' : 'font-weight: 700' }}">@lang('global.app_all')</a></li>
         |
         <li><a href="{{ route('admin.invitations.index') }}?show_deleted=1"
                style="{{ request('show_deleted') == 1 ? 'font-weight: 700' : '' }}">@lang('global.app_trash')</a></li>
+        |
+        <li><a href="{{ route('admin.invitations.index') }}?show_invited=1"
+               style="{{ request('show_invited') == 1 ? 'font-weight: 700' : '' }}">@lang('global.app_invited')</a></li>
+        |
+        <li><a href="{{ route('admin.invitations.index') }}?show_uninvited=1"
+               style="{{ request('show_uninvited') == 1 ? 'font-weight: 700' : '' }}">@lang('global.app_uninvited')</a></li>
     </ul>
-    </p>
 
 
     <div class="panel panel-default">
@@ -101,9 +105,15 @@
                                 <td>
                                     @can('invitation_view')
                                         @if (!$invitation->sent_at)
-                                            <a href="{{ route('admin.invitations.send',[$invitation->id]) }}"
+                                            <a href="{{ route('admin.invitations.send',[$invitation->id])."?mail=1" }}"
                                                class="btn btn-xs btn-primary">@lang('global.app_send')</a>
                                         @endif
+                                            <a href="{{ route('admin.invitations.send',[$invitation->id])."?direct=1" }}"
+                                               class="btn btn-xs btn-primary">@lang('global.app_send_direct')</a>
+                                            <a href="{{ route('admin.invitations.send',[$invitation->id])."phone=1" }}"
+                                               class="btn btn-xs btn-primary">@lang('global.app_send_phone')</a>
+                                            <a href="{{ route('admin.invitations.send',[$invitation->id])."sms=1" }}"
+                                               class="btn btn-xs btn-primary">@lang('global.app_send_sms')</a>
                                         <a href="{{ route('admin.invitations.show',[$invitation->id]) }}"
                                            class="btn btn-xs btn-primary">@lang('global.app_view')</a>
                                     @endcan

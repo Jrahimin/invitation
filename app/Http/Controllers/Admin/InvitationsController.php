@@ -17,26 +17,33 @@ use Illuminate\Support\Facades\Mail;
 
 class InvitationsController extends Controller
 {
-    /**
-     * Display a listing of Invitation.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
         if (!Gate::allows('invitation_access')) {
             return abort(401);
         }
 
 
-        if (request('show_deleted') == 1) {
+        if ($request->show_deleted == 1) {
             if (!Gate::allows('invitation_delete')) {
                 return abort(401);
             }
             $invitations = Invitation::onlyTrashed()->get();
-        } else {
-            $invitations = Invitation::all();
+
+            return view('admin.invitations.index', compact('invitations'));
         }
+
+        if($request->show_invited){
+            $invitations = Invitation::whereNotNull('sent_at')->get();
+            return view('admin.invitations.index', compact('invitations'));
+        }
+
+        if($request->show_uninvited){
+            $invitations = Invitation::whereNull('sent_at')->get();
+            return view('admin.invitations.index', compact('invitations'));
+        }
+
+        $invitations = Invitation::all();
 
         return view('admin.invitations.index', compact('invitations'));
     }
@@ -192,7 +199,14 @@ class InvitationsController extends Controller
 
         DB::beginTransaction();
 
-        $invitation->update($request->all());
+        if($request->phone){
+            $request['phone_count'] = $invitation->phone_count + 1;
+        }
+        if($request->direct){
+            $request['direct_contact_count'] = $invitation->direct_contact_count + 1;
+        }
+
+        $invitation->update($request->except('direct', 'phone'));
         $event->update(['total_guest' => $updatedCount]);
 
         DB::commit();
@@ -223,15 +237,34 @@ class InvitationsController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function send($id)
+    public function send($id, Request $request)
     {
         if (!Gate::allows('invitation_view')) {
             return abort(401);
         }
         $invitation = Invitation::findOrFail($id);
-        Mail::to($invitation->email)->send(new InvitationSend($invitation));
 
-        $invitation->update(['sent_at' => Carbon::now()->toDateTimeString()]);
+        DB::beginTransaction();
+
+        if(!$invitation->sent_at){
+            $invitation->event->increment('total_invited', $invitation->people_count);
+        }
+
+        if($request->direct == 1){
+            $invitation->direct_contact_count = $invitation->direct_contact_count + 1;
+        } elseif($request->phone == 1){
+            $invitation->phone_count = $invitation->phone_count + 1;
+        } elseif($request->sms == 1){
+            $invitation->sms_count = $invitation->sms_count + 1;
+        } elseif($request->mail == 1){
+            Mail::to($invitation->email)->send(new InvitationSend($invitation));
+            $invitation->email_count = $invitation->email_count + 1;
+        }
+
+        $invitation->sent_at = Carbon::now()->toDateTimeString();
+        $invitation->save();
+
+        DB::commit();
 
         return redirect()->route('admin.invitations.index');
     }
