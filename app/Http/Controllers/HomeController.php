@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use App\Invitation;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -17,13 +18,13 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return view('home');
+        $data = [];
+        $data['totalGuest'] = Invitation::sum('people_count');
+        $data['totalInvited'] = Invitation::whereNotNull('sent_at')->sum('people_count');
+        $data['totalUninvited'] = Invitation::whereNull('sent_at')->sum('people_count');
+
+        return view('home', $data);
     }
 }

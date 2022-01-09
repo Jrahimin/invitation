@@ -28,7 +28,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            @lang('global.app_list')
+            @lang('global.app_list') of Total {{ count($invitations) }} Entries
         </div>
 
         <div class="panel-body table-responsive">

@@ -34,10 +34,8 @@
 
             <div class="row">
                 <div class="col-xs-12 form-group">
-                    <label class="checkbox-inline"><input type="checkbox" value="1" name="direct">Direct Contact</label>
-                    <label class="checkbox-inline"><input type="checkbox" value="1" name="phone">Phone Contact</label>
-                    {{--{!! Form::label($field, trans("global.{$module}.fields.{$field}"), ['class' => 'control-label']) !!}
-                    {!! Form::$type($field, $value, ['class' => 'form-control', 'value' => 'xsdsdsad', 'rows'=>2, 'placeholder' => $placeholder ?? '', 'required' => isset($required)]) !!}--}}
+                    <label class="checkbox-inline"><input type="checkbox" value="1" name="direct" {{ $invitation->direct_contact_count ? 'checked' :'' }}>Direct Contact</label>
+                    <label class="checkbox-inline"><input type="checkbox" value="1" name="phone" {{ $invitation->phone_count ? 'checked' :'' }}>Phone Contact</label>
                 </div>
             </div>
         </div>

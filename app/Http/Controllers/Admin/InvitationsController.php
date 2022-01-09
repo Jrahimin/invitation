@@ -199,10 +199,10 @@ class InvitationsController extends Controller
 
         DB::beginTransaction();
 
-        if($request->phone){
+        if($request->phone && $invitation->phone_count == 0){
             $request['phone_count'] = $invitation->phone_count + 1;
         }
-        if($request->direct){
+        if($request->direct && $invitation->direct_contact_count == 0){
             $request['direct_contact_count'] = $invitation->direct_contact_count + 1;
         }
 
